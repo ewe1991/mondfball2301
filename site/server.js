@@ -20,31 +20,14 @@ class TeamPickerServer {
       team1: [],
       team2: [],
     };
-    this.lastAssignedTeam = 'team2'; // Track the last team that was assigned
-    this.socketTeams = {}; // Keep track of the teams for each socket
     this.setupSocket();
-  }
-
-  reset() {
-    this.selectedTeams = {
-      team1: [],
-      team2: [],
-    };
-    this.io.emit('updateTeams', this.selectedTeams);
   }
 
   setupSocket() {
     this.io.on('connection', (socket) => {
-      
       // Assign the client to a team and inform them
-      const team = this.lastAssignedTeam === 'team1' ? 'team2' : 'team1';
-      this.lastAssignedTeam = team;
-      this.socketTeams[socket.id] = team;
+      let team = this.selectedTeams.team1.length <= this.selectedTeams.team2.length ? 'team1' : 'team2';
       socket.emit('setTeam', team);
-
-      socket.emit('updatePlayers', this.availablePlayers);
-      socket.emit('updateTeams', this.selectedTeams);
-      socket.emit('turn', this.turn);
 
       socket.on('addPlayers', (players) => {
         this.availablePlayers = players;
@@ -52,15 +35,13 @@ class TeamPickerServer {
       });
 
       socket.on('pickPlayer', (player) => {
-        // Only allow picking a player if it's the client's turn
-        if (this.socketTeams[socket.id] === this.turn && this.availablePlayers.includes(player)) {
+        if (this.availablePlayers.includes(player)) {
           this.availablePlayers = this.availablePlayers.filter((p) => p !== player);
-          const { team1, team2 } = this.selectedTeams;
           if (this.turn === 'team1') {
-            team1.push(player);
+            this.selectedTeams.team1.push(player);
             this.turn = 'team2'; // Switch the turn to Team 2
           } else {
-            team2.push(player);
+            this.selectedTeams.team2.push(player);
             this.turn = 'team1'; // Switch the turn back to Team 1
           }
           this.io.emit('updatePlayers', this.availablePlayers);
@@ -70,22 +51,18 @@ class TeamPickerServer {
       });
 
       socket.on('disconnect', () => {
-        delete this.socketTeams[socket.id]; // Clean up after disconnection
         console.log('A user disconnected');
-      });
-
-      socket.on('reset', () => {
-        this.reset();
       });
     });
   }
 
   start(port) {
-    this.server.listen(port, () => {
+    this.server.listen(port, '0.0.0.0', () => {
       console.log(`Server started on port ${port}`);
     });
   }
 }
-const port = process.env.PORT || 3000;
+
+const PORT = process.env.PORT || 3000; // Use the PORT from the environment variables, otherwise use 3000 as default.
 const server = new TeamPickerServer();
-server.start(port);
+server.start(PORT);
