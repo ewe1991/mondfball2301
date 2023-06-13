@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monday Night Team Picker</title>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <h1>Team Picker</h1>
+
+      <div id="admin">
+        <h2>Add Players</h2>
+        <textarea id="playerNames" placeholder="Enter player names (one per line)" rows="5" cols="33"></textarea><br>
+        <button id="addPlayers">Add Players</button>
+        <button id="clearPlayers">Clear Players</button>
+        <button id="reset">Reset Selected Teams</button>
+      </div>
+
+      <h2 id="turn"></h2>
+
+      <h2>Available Players</h2>
+      <div id="players"></div>
+
+      <h2>Selected Teams</h2>
+      <div id="teams"></div>
+      <button id="copyButton">Copy to Clipboard</button>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
