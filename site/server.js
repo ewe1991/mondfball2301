@@ -26,6 +26,7 @@ class TeamPickerServer {
       team2: [],
     };
     this.setupSocket();
+    this.setupRoutes();
   }
 
   setupSocket() {
@@ -58,6 +59,20 @@ class TeamPickerServer {
       socket.on('disconnect', () => {
         console.log('A user disconnected');
       });
+    });
+  }
+
+  setupRoutes() {
+    this.app.get('/admin', (req, res) => {
+      res.sendFile(path.join(__dirname, '../site/dist/index.html'));
+    });
+
+    this.app.get('/team1', (req, res) => {
+      res.sendFile(path.join(__dirname, '../site/dist/index.html'));
+    });
+
+    this.app.get('/team2', (req, res) => {
+      res.sendFile(path.join(__dirname, '../site/dist/index.html'));
     });
   }
 
