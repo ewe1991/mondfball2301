@@ -2,11 +2,13 @@ import express from 'express';
 import { Server } from 'socket.io';
 import http from 'http';
 import cors from 'cors';
+import path from 'path';
 
 class TeamPickerServer {
   constructor() {
     this.app = express();
     this.app.use(cors());
+    this.app.use('/', express.static(path.join(__dirname, 'site/dist')));
     this.server = http.createServer(this.app);
     this.io = new Server(this.server, {
       cors: {
