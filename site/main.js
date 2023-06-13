@@ -8,8 +8,8 @@ class TeamPickerClient {
       team1: [],
       team2: [],
     };
-    this.turn = 'team1'; // Initialize the turn
-  }  
+    this.turn = ''; // Initialize the turn
+  }
 
   addPlayers(players) {
     this.socket.emit('addPlayers', players);
@@ -20,29 +20,31 @@ class TeamPickerClient {
   }
 
   pickPlayer(player) {
-    // Only allow picking a player if it's the client's turn
-    if (this.team === this.turn) {
+    if ((this.turn === 'team1' && this.team === 'team1') || (this.turn === 'team2' && this.team === 'team2')) {
       if (window.confirm(`Are you sure you want to pick ${player}?`)) {
         this.socket.emit('pickPlayer', player);
       }
     } else {
-      window.alert(`Wait for your turn, Team ${this.team}`);
+      const currentTeam = this.turn === 'team1' ? 'Team 1' : 'Team 2';
+      window.alert(`Wait for your turn, it's ${currentTeam}'s turn.`);
     }
   }
+  
 
-    // Add this method to set the team
-    setTeam(team) {
-      this.team = team;
-    }
+  setTeam(team) {
+    this.team = team;
+    this.updateTurnUI(); // Update the turn UI when the team is set
+  }
 
   listenForUpdates() {
+    this.socket.on('setTeam', (team) => {
+      this.setTeam(team);
+      this.updateTurnUI(); // Update the turn UI when the team is set
+    });
+
     this.socket.on('updatePlayers', (players) => {
       this.availablePlayers = players;
       this.updateAvailablePlayersUI();
-    });
-
-    this.socket.on('setTeam', (team) => {
-      this.setTeam(team);
     });
 
     this.socket.on('updateTeams', (teams) => {
@@ -50,13 +52,12 @@ class TeamPickerClient {
       this.updateSelectedTeamsUI();
     });
 
-    // Request the initial state from the server
-    this.socket.emit('requestState');
-
     this.socket.on('turn', (turn) => {
       this.turn = turn;
-      this.updateTurnUI();
+      this.updateTurnUI(); // Update the turn UI when the turn is updated
     });
+
+    this.socket.emit('requestState');
   }
 
   updateAvailablePlayersUI() {
@@ -67,9 +68,7 @@ class TeamPickerClient {
       const button = document.createElement('button');
       button.innerText = player;
       button.addEventListener('click', () => {
-        if (this.turn === 'team1' || this.turn === 'team2') {
-          this.pickPlayer(player);
-        }
+        this.pickPlayer(player);
       });
       playersElement.appendChild(button);
     }
@@ -78,16 +77,16 @@ class TeamPickerClient {
   updateSelectedTeamsUI() {
     const teamsElement = document.getElementById('teams');
     teamsElement.innerHTML = '';
-  
+
     const team1Element = document.createElement('div');
-    team1Element.innerText = `Team 1: ${this.selectedTeams.team1 && this.selectedTeams.team1.length > 0 ? this.selectedTeams.team1.join(', ') : 'No players selected'}`;
+    team1Element.innerText = `Team 1: ${this.selectedTeams.team1.join(', ')}`;
     teamsElement.appendChild(team1Element);
-  
+
     const team2Element = document.createElement('div');
-    team2Element.innerText = `Team 2: ${this.selectedTeams.team2 && this.selectedTeams.team2.length > 0 ? this.selectedTeams.team2.join(', ') : 'No players selected'}`;
+    team2Element.innerText = `Team 2: ${this.selectedTeams.team2.join(', ')}`;
     teamsElement.appendChild(team2Element);
   }
-  
+
   updateTurnUI() {
     const turnElement = document.getElementById('turn');
     if (this.turn === 'team1') {
@@ -98,11 +97,21 @@ class TeamPickerClient {
       turnElement.innerText = '';
     }
   }
-  
+
+  clearPlayers() {
+    this.socket.emit('clearPlayers');
+  }
 }
 
 const socket = io('http://localhost:3000');
 const client = new TeamPickerClient(socket);
+
+// Set the team based on the current pathname
+if (window.location.pathname === '/team1') {
+  client.team = 'team1';
+} else if (window.location.pathname === '/team2') {
+  client.team = 'team2';
+}
 
 if (window.location.pathname === '/admin') {
   document.getElementById('admin').style.display = 'block';
@@ -111,6 +120,9 @@ if (window.location.pathname === '/admin') {
     client.reset();
   });
 
+  document.getElementById('clearPlayers').addEventListener('click', () => {
+    client.clearPlayers();
+  });
 } else {
   document.getElementById('admin').style.display = 'none';
 }
@@ -123,12 +135,10 @@ document.getElementById('addPlayers').addEventListener('click', () => {
 });
 
 document.getElementById('copyButton').addEventListener('click', () => {
-  // Generate the text for the teams
   const team1Text = `Team 1: ${client.selectedTeams.team1.join(', ')}`;
   const team2Text = `Team 2: ${client.selectedTeams.team2.join(', ')}`;
   const fullText = `${team1Text}\n${team2Text}`;
 
-  // Copy the text to the clipboard
   navigator.clipboard.writeText(fullText).then(() => {
     console.log('Copied to clipboard');
   }).catch((err) => {
