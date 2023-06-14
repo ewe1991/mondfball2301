@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
+    "esbuild": "^0.18.2",
     "vite": "^4.3.9"
   },
   "dependencies": {
