@@ -12,8 +12,12 @@ class TeamPickerServer {
     this.app = express();
     this.app.use(cors());
 
+    console.log(__dirname);
+
     this.app.use(express.static(path.join(__dirname, "dist")));
+    console.log(`dist: ${express.static(path.join(__dirname, "dist"))}`);
     this.app.use("/assets", express.static(path.join(__dirname, "assets")));
+    console.log(`assets: ${express.static(path.join(__dirname, "assets"))}`);
     
     this.server = http.createServer(this.app);
     this.io = new Server(this.server, {
