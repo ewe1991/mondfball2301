@@ -3,6 +3,7 @@ services:
   - type: web
     name: team-picker-app
     buildCommand:
+      - npm install
       - npm run build
     startCommand:
       - npm start
