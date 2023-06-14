@@ -9,7 +9,7 @@
     "prebuild": "npm install",
     "build": "npx vite build && cp -R node_modules dist/assets && npx esbuild server.js --platform=node --outfile=dist/assets/server.js",
     "start": "node dist/assets/server.js",
-    "preview": "vite preview"
+    "preview": "concurrently \"vite preview\" \"npm start\""
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
