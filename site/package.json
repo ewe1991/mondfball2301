@@ -6,7 +6,7 @@
   "main": "main.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && esbuild server.js --platform=node --outfile=dist/assets/server.js",
+    "build": "npx vite build && npx esbuild server.js --platform=node --outfile=dist/assets/server.js",
     "start": "node dist/assets/server.js",
     "preview": "vite preview"
   },
