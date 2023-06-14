@@ -11,7 +11,7 @@ class TeamPickerServer {
   constructor() {
     this.app = express();
     this.app.use(cors());
-    this.app.use("/", express.static(path.join(__dirname, "../site/dist")));
+    this.app.use("/", express.static(path.join(__dirname, "dist")));
     this.server = http.createServer(this.app);
     this.io = new Server(this.server, {
       cors: {
@@ -119,19 +119,19 @@ class TeamPickerServer {
 
   setupRoutes() {
     this.app.get("/", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist/index.html"));
+      res.sendFile(path.join(__dirname, "index.html"));
     });
 
     this.app.get("/admin", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist/index.html"));
+      res.sendFile(path.join(__dirname, "index.html"));
     });
 
     this.app.get("/team1", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist/index.html"));
+      res.sendFile(path.join(__dirname, "index.html"));
     });
 
     this.app.get("/team2", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist/index.html"));
+      res.sendFile(path.join(__dirname, "index.html"));
     });
   }
 
