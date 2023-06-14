@@ -14,11 +14,11 @@ class TeamPickerServer {
 
     console.log(__dirname);
 
-    const distPath = path.join(__dirname, "dist");
+    const distPath = path.join(__dirname, "../dist");
     console.log(`dist: ${distPath}`);
     this.app.use(express.static(distPath));
     
-    const assetsPath = path.join(__dirname, "assets");
+    const assetsPath = path.join(__dirname, "../dist/assets");
     console.log(`assets: ${assetsPath}`);
     this.app.use("/assets", express.static(assetsPath));
     
