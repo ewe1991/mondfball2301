@@ -103,8 +103,9 @@ class TeamPickerClient {
   }
 }
 
-const socket = io('http://localhost:3000');
+const socket = io(`http://${location.host}`);
 const client = new TeamPickerClient(socket);
+
 
 // Set the team based on the current pathname
 if (window.location.pathname === '/team1') {
