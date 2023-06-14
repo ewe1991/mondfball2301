@@ -18,7 +18,7 @@ class TeamPickerServer {
     console.log(`dist: ${distPath}`);
     this.app.use(express.static(distPath));
     
-    const assetsPath = path.join(__dirname, "../dist/assets");
+    const assetsPath = path.join(__dirname, "../assets");
     console.log(`assets: ${assetsPath}`);
     this.app.use("/assets", express.static(assetsPath));
     
