@@ -103,7 +103,7 @@ class TeamPickerClient {
   }
 }
 
-const socket = io(`http://${location.host}`);
+const socket = io(`https://${location.host}`);
 const client = new TeamPickerClient(socket);
 
 
