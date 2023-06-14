@@ -42,46 +42,56 @@ class TeamPickerServer {
 
   setupSocket() {
     this.io.on("connection", (socket) => {
-      let team = this.determineTeam();
-      if (team === this.lastPlayerTurn) {
-        team = team === "team1" ? "team2" : "team1";
+      let team = "";
+  
+      if (socket.handshake.headers.referer.includes("/team1")) {
+        team = "team1";
+      } else if (socket.handshake.headers.referer.includes("/team2")) {
+        team = "team2";
       }
+  
+      // If neither /team1 nor /team2, assign team randomly
+      if (team === "") {
+        team = this.determineTeam();
+        if (team === this.lastPlayerTurn) {
+          team = team === "team1" ? "team2" : "team1";
+        }
+      }
+  
       this.lastPlayerTurn = team;
       socket.team = team;
       socket.emit("setTeam", team);
       socket.emit("updatePlayers", this.availablePlayers);
       socket.emit("updateTeams", this.selectedTeams);
       socket.emit("turn", this.turn);
-
+  
       socket.on("addPlayers", (players) => {
         this.availablePlayers = players;
         this.io.emit("updatePlayers", this.availablePlayers);
       });
-
+  
       socket.on("pickPlayer", (player) => {
-        if (
-          this.turn === socket.team &&
-          this.availablePlayers.includes(player)
-        ) {
+        if (this.turn === socket.team && this.availablePlayers.includes(player)) {
           this.pickPlayer(socket, player);
         }
       });
-
+  
       socket.on("reset", () => {
         this.resetGame();
       });
-
+  
       socket.on("requestState", () => {
         socket.emit("updatePlayers", this.availablePlayers);
         socket.emit("updateTeams", this.selectedTeams);
         socket.emit("turn", this.turn);
       });
-
+  
       socket.on("disconnect", () => {
         console.log("A user disconnected");
       });
     });
   }
+  
 
   determineTeam() {
     let team;
