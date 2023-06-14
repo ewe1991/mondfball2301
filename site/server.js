@@ -118,16 +118,20 @@ class TeamPickerServer {
   }
 
   setupRoutes() {
+    this.app.get("/", (req, res) => {
+      res.sendFile(path.join(__dirname, "dist/index.html"));
+    });
+
     this.app.get("/admin", (req, res) => {
-      res.sendFile(path.join(__dirname, "../site/dist/index.html"));
+      res.sendFile(path.join(__dirname, "dist/index.html"));
     });
 
     this.app.get("/team1", (req, res) => {
-      res.sendFile(path.join(__dirname, "../site/dist/index.html"));
+      res.sendFile(path.join(__dirname, "dist/index.html"));
     });
 
     this.app.get("/team2", (req, res) => {
-      res.sendFile(path.join(__dirname, "../site/dist/index.html"));
+      res.sendFile(path.join(__dirname, "dist/index.html"));
     });
   }
 
