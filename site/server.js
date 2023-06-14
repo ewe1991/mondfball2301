@@ -16,11 +16,11 @@ class TeamPickerServer {
     this.server = http.createServer(this.app);
     this.io = new Server(this.server, {
       cors: {
-        origin: "*", // This allows all origins. Adjust according to your needs.
+        origin: "*",
         methods: ["GET", "POST"],
       },
     });
-    this.turn = "team1"; // Initialize the turn to Team 1
+    this.turn = "team1";
     this.availablePlayers = [];
     this.selectedTeams = {
       team1: [],
@@ -32,22 +32,16 @@ class TeamPickerServer {
 
   setupSocket() {
     this.io.on("connection", (socket) => {
-      // Assign the client to a team and inform them
       let team = this.determineTeam();
-
       if (team === this.lastPlayerTurn) {
-        team = team === "team1" ? "team2" : "team1"; // Switch the team if the last player's turn was the same as this team
+        team = team === "team1" ? "team2" : "team1";
       }
-    
-      this.lastPlayerTurn = team; // Update the last player's turn
-    
-      // Assign the team to the socket
+      this.lastPlayerTurn = team;
       socket.team = team;
-    
       socket.emit("setTeam", team);
       socket.emit("updatePlayers", this.availablePlayers);
       socket.emit("updateTeams", this.selectedTeams);
-      socket.emit("turn", this.turn); // Emit the initial turn to the client
+      socket.emit("turn", this.turn);
 
       socket.on("addPlayers", (players) => {
         this.availablePlayers = players;
@@ -70,7 +64,7 @@ class TeamPickerServer {
       socket.on("requestState", () => {
         socket.emit("updatePlayers", this.availablePlayers);
         socket.emit("updateTeams", this.selectedTeams);
-        socket.emit("turn", this.turn); 
+        socket.emit("turn", this.turn);
       });
 
       socket.on("disconnect", () => {
@@ -86,24 +80,21 @@ class TeamPickerServer {
     } else {
       team = "team2";
     }
-
     return team;
   }
 
   pickPlayer(socket, player) {
-    this.availablePlayers = this.availablePlayers.filter(
-      (p) => p !== player
-    );
+    this.availablePlayers = this.availablePlayers.filter((p) => p !== player);
     if (socket.team === "team1") {
       this.selectedTeams.team1.push(player);
-      this.turn = "team2"; // Switch the turn to Team 2
+      this.turn = "team2";
     } else {
       this.selectedTeams.team2.push(player);
-      this.turn = "team1"; // Switch the turn back to Team 1
+      this.turn = "team1";
     }
     this.io.emit("updatePlayers", this.availablePlayers);
     this.io.emit("updateTeams", this.selectedTeams);
-    this.io.emit("turn", this.turn); // Emit the new turn to all clients
+    this.io.emit("turn", this.turn);
   }
 
   resetGame() {
@@ -120,19 +111,19 @@ class TeamPickerServer {
 
   setupRoutes() {
     this.app.get("/", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist/index.html"));
+      res.sendFile(path.join(__dirname, "../dist/index.html"));
     });
 
     this.app.get("/admin", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist/index.html"));
+      res.sendFile(path.join(__dirname, "../dist/index.html"));
     });
 
     this.app.get("/team1", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist/index.html"));
+      res.sendFile(path.join(__dirname, "../dist/index.html"));
     });
 
     this.app.get("/team2", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist/index.html"));
+      res.sendFile(path.join(__dirname, "../dist/index.html"));
     });
   }
 
@@ -143,6 +134,7 @@ class TeamPickerServer {
   }
 }
 
-const PORT = process.env.PORT || 3000; // Use the PORT from the environment variables, otherwise use 3000 as default.
+const PORT = process.env.PORT || 3000;
 const server = new TeamPickerServer();
 server.start(PORT);
+
